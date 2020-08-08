@@ -1,6 +1,8 @@
 const { Client } = require('pg');
 
-const client = new Client('postgres://localhost:5432/juicebox-dev');
+const connectectionString = 'postgres://localhost:5432/fitness-dev';
+
+const client = new Client(connectectionString);
 
 module.exports = {
     client,
