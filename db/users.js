@@ -9,13 +9,13 @@ async function getAllUsers() {
     return rows;
 }
 
-async function getUser({ username, password }) {
+async function getUser({ username }) {
     try {
         const { rows: [user] } = await client.query(`
         SELECT *
         FROM users
-        WHERE username=$1 AND password=$2;
-        `, [username, password]);
+        WHERE username=$1;
+        `, [username]);
 
         return user;
     } catch (error) {

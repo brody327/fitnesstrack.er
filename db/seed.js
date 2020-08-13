@@ -1,8 +1,4 @@
 const { client } = require("./client");
-// const { getAllUsers, getUser, createUser } = require("./users");
-// const { getAllActivities, createActivity, updateActivity } = require("./activities");
-// const { getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivityId, updateRoutine, createRoutine, destroyRoutine } = require('./routines');
-// const { updateRoutineActivity, destroyRoutineActivity } = require("./routine_activities");
 
 const { getAllUsers, getUser, createUser,
     getAllActivities, createActivity, updateActivity,
@@ -255,7 +251,7 @@ async function testDB() {
         const users = await getAllUsers();
         console.log("getAllUsers:", users);
 
-        const oneUser = await getUser({ username: 'lacey', password: 'lacey21' });
+        const oneUser = await getUser({ username: 'lacey' });
         console.log('getUser:', oneUser);
 
         const activities = await getAllActivities();

@@ -21,8 +21,6 @@ async function getActivityByName(activityName) {
         WHERE name = $1;
         `, [activityName]);
 
-        console.log("getActivityByName:", activity);
-
         return activity;
     } catch (error) {
         throw error;
@@ -36,8 +34,6 @@ async function getActivityById(activityId) {
         FROM activities
         WHERE id = $1;
         `, [activityId]);
-
-        console.log("getActivityById:", rows);
 
         return rows;
     } catch (error) {
