@@ -18,13 +18,16 @@ const { client } = require("./client");
 async function createRoutineActivities({ routineId, activityId, duration, sets, reps }) {
     try {
         console.log("Creating routine_activity...")
-        await client.query(`
+
+        const { rows: [routine] } = await client.query(`
         INSERT INTO routine_activities("routineId", "activityId", duration, sets, reps)
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT ("routineId", "activityId") DO NOTHING
         RETURNING *;
         `, [routineId, activityId, duration, sets, reps])
+
         console.log("Finished creating routine_activity!")
+        return routine;
     } catch (error) {
         throw error;
     }

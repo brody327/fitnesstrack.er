@@ -6,20 +6,15 @@ activities
 
 routines
 
-POST /routines (*)
-Create a new routine
-
 PATCH /routines/:routineId (**)
 Update a routine, notably change public/private, the name, or the goal
 
 DELETE /routines/:routineId (**)
 Hard delete a routine. Make sure to delete all the routineActivities whose routine is the one being deleted.
 
-POST /routines/:routineId/activities
-Attach a single activity to a routine. Prevent duplication on (routineId, activityId) pair.
-
 
 routine_activities
+
 PATCH /routine_activities/:routineActivityId (**)
 Update the count or duration on the routine activity
 

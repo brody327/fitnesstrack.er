@@ -158,11 +158,7 @@ async function getPublicRoutinesByActivityId({ activityId }) {
 //Original Call
 //async function createRoutine({ userId, public, name, goal }, activities = []) {
 async function createRoutine({ routineData, activities = [] }) {
-    console.log("DB:", routineData);
-    console.log("DB SENT SCTIVITIES:", activities);
-
     const { name, userId, public, goal } = routineData;
-    console.log(name, userId, public, goal);
 
     try {
         const { rows: [routine] } = await client.query(`
@@ -172,20 +168,15 @@ async function createRoutine({ routineData, activities = [] }) {
         RETURNING *;
         `, [userId, public, name, goal]);
 
-        console.log("TABLE ROUTINE:", routine);
-
         for (const activity of activities) {
-            console.log(activities);
             activity.name = (activity.name).toLowerCase();
             const activityIdObject = await getActivityByName(activity.name);
 
             activity.activityId = activityIdObject.id;
             activity.routineId = routine.id;
-            console.log("DB Activity:", activity);
             await createRoutineActivities(activity);
         }
 
-        console.log("BEFORE RETURN DB:", routine);
         return await getRoutineById(routine.id);
     } catch (error) {
         throw error;
@@ -290,6 +281,7 @@ module.exports = {
     getRoutineByName,
     getPublicRoutinesByUser,
     getPublicRoutinesByActivityId,
+    getRoutineById,
     createRoutine,
     updateRoutine,
     destroyRoutine
