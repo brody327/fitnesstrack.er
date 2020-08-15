@@ -38,6 +38,24 @@ async function getAllPublicRoutines() {
     }
 }
 
+async function getRoutineByName({ name }) {
+    try {
+        const { rows: id } = await client.query(`
+        SELECT id
+        FROM routines
+        WHERE name=$1;
+        `, [name]);
+
+        // const routines = await Promise.all(routineIds.map(
+        //     routine => getRoutineById(routine.id)
+        // ));
+
+        return id;
+    } catch (error) {
+        throw error;
+    }
+}
+
 async function getAllRoutinesByUser({ username }) {
     try {
         const { rows: user } = await client.query(`
@@ -137,8 +155,15 @@ async function getPublicRoutinesByActivityId({ activityId }) {
 //     }
 
 // }
+//Original Call
+//async function createRoutine({ userId, public, name, goal }, activities = []) {
+async function createRoutine({ routineData, activities = [] }) {
+    console.log("DB:", routineData);
+    console.log("DB SENT SCTIVITIES:", activities);
 
-async function createRoutine({ userId, public, name, goal }, activities = []) {
+    const { name, userId, public, goal } = routineData;
+    console.log(name, userId, public, goal);
+
     try {
         const { rows: [routine] } = await client.query(`
         INSERT INTO routines("userId", public, name, goal)
@@ -147,16 +172,20 @@ async function createRoutine({ userId, public, name, goal }, activities = []) {
         RETURNING *;
         `, [userId, public, name, goal]);
 
+        console.log("TABLE ROUTINE:", routine);
+
         for (const activity of activities) {
+            console.log(activities);
             activity.name = (activity.name).toLowerCase();
             const activityIdObject = await getActivityByName(activity.name);
 
             activity.activityId = activityIdObject.id;
             activity.routineId = routine.id;
-
+            console.log("DB Activity:", activity);
             await createRoutineActivities(activity);
         }
 
+        console.log("BEFORE RETURN DB:", routine);
         return await getRoutineById(routine.id);
     } catch (error) {
         throw error;
@@ -258,6 +287,7 @@ module.exports = {
     getAllRoutines,
     getAllPublicRoutines,
     getAllRoutinesByUser,
+    getRoutineByName,
     getPublicRoutinesByUser,
     getPublicRoutinesByActivityId,
     createRoutine,

@@ -4,10 +4,6 @@ users
 
 activities
 
-PATCH /activities/:activityId (*)
-Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)
-
-
 routines
 
 POST /routines (*)

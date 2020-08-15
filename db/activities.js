@@ -15,11 +15,14 @@ async function getAllActivities() {
 
 async function getActivityByName(activityName) {
     try {
+        activityName = activityName.toLowerCase();
         const { rows: [activity] } = await client.query(`
         SELECT *
         FROM activities
         WHERE name = $1;
         `, [activityName]);
+
+        console.log("ACTIVITY NAME GET BBY NEM:", activityName);
 
         return activity;
     } catch (error) {

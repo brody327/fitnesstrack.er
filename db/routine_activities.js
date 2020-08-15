@@ -18,7 +18,7 @@ const { client } = require("./client");
 async function createRoutineActivities({ routineId, activityId, duration, sets, reps }) {
     try {
         console.log("Creating routine_activity...")
-        const { rows } = await client.query(`
+        await client.query(`
         INSERT INTO routine_activities("routineId", "activityId", duration, sets, reps)
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT ("routineId", "activityId") DO NOTHING

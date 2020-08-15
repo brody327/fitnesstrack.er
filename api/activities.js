@@ -82,7 +82,12 @@ activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
     if (!name || !description) {
         next({
             name: "MissingCredentialsError",
-            message: "Please supply both a username and password"
+            message: "Please supply both a name and description."
+        });
+    } else if (await getActivityByName(name)) {
+        next({
+            name: "InvalidInput",
+            message: "The input activity name already exists."
         });
     } else {
         try {
@@ -95,7 +100,7 @@ activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
                 const updatedActivity = await updateActivity(activityId, updateFields)
                 res.send({ activity: updatedActivity });
             } else {
-                next({ name: "", message: "" });
+                next({ name: "InvalidInput", message: "This activity does not exist." });
             }
         } catch (error) {
             next(error);

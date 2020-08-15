@@ -2,7 +2,7 @@ const { client } = require("./client");
 
 const { getAllUsers, getUser, createUser,
     getAllActivities, createActivity, updateActivity,
-    getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivityId, updateRoutine, createRoutine, destroyRoutine,
+    getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getRoutineByName, getPublicRoutinesByUser, getPublicRoutinesByActivityId, updateRoutine, createRoutine, destroyRoutine,
     updateRoutineActivity, destroyRoutineActivity } = require("./index");
 
 async function dropTables() {
@@ -125,15 +125,14 @@ async function createInitialActivities() {
 async function createInitialRoutines() {
     try {
         console.log("Starting to create routines...");
-
-        await createRoutine(
-            {
+        await createRoutine({
+            routineData: {
                 userId: 1,
                 public: false,
                 name: "Monday",
                 goal: "Chest workout and legs."
             },
-            [
+            activities: [
                 {
                     name: "pull-up",
                     duration: 60,
@@ -146,83 +145,143 @@ async function createInitialRoutines() {
                     reps: 1
                 }
             ]
-        );
-        await createRoutine({ userId: 3, public: true, name: "REDEMPTION", goal: "EVERYTHING!" }, [{
-            name: "SIT-UP",
-            duration: 120,
-            sets: 500,
-            reps: 100
-        },]);
-        await createRoutine(
-            {
-                userId: 2,
-                public: false,
-                name: "TUESDAY DOOMSDAY",
-                goal: "You know it ;)."
+        });
+
+        const routineOne = await createRoutine({
+            "routineData": {
+                "name": "This routine",
+                "goal": "Be the best.",
+                "public": true
             },
-            [
+            "activities": [
                 {
-                    name: "pull-up",
-                    duration: 60,
-                    sets: 5,
-                    reps: 10
+                    "name": "Pull-up"
                 },
                 {
-                    name: "PUSH-up",
-                    sets: 12,
-                    reps: 1
-                },
-                {
-                    name: "Sit-up",
-                    sets: 12,
-                    reps: 1
+                    "name": "PUSH-up",
+                    "sets": 12,
+                    "reps": 1
                 }
             ]
-        );
 
-        await createRoutine(
-            {
-                userId: 2,
-                public: true,
-                name: "FRIDAY MYDAY",
-                goal: "YEAH!."
+        });
+
+        await createRoutine({
+            "routineData": {
+                "name": "A new one",
+                "goal": "random goal",
+                "public": true
             },
-            [
+            "activities": [
                 {
-                    name: "pull-up",
-                    duration: 60,
-                    sets: 5,
-                    reps: 10
+                    "name": "Pull-up"
                 },
                 {
-                    name: "PUSH-up",
-                    sets: 12,
-                    reps: 1
-                },
-                {
-                    name: "Sit-up",
-                    sets: 12,
-                    reps: 1
+                    "name": "PUSH-up",
+                    "sets": 12,
+                    "reps": 1
                 }
             ]
-        );
 
-        await createRoutine(
-            {
-                userId: 1,
-                public: true,
-                name: "DESTROY ME",
-                goal: ":O"
-            },
-            [
-                {
-                    name: "PUSH-up",
-                    sets: 12,
-                    reps: 1
-                }
-            ]
-        );
+        });
 
+        // await createRoutine(
+        //     {
+        //         userId: 1,
+        //         public: false,
+        //         name: "Monday",
+        //         goal: "Chest workout and legs."
+        //     },
+        //     [
+        //         {
+        //             name: "pull-up",
+        //             duration: 60,
+        //             sets: 5,
+        //             reps: 10
+        //         },
+        //         {
+        //             name: "PUSH-up",
+        //             sets: 12,
+        //             reps: 1
+        //         }
+        //     ]
+        // );
+        // await createRoutine({ userId: 3, public: true, name: "REDEMPTION", goal: "EVERYTHING!" }, [{
+        //     name: "SIT-UP",
+        //     duration: 120,
+        //     sets: 500,
+        //     reps: 100
+        // },]);
+        // await createRoutine(
+        //     {
+        //         userId: 2,
+        //         public: false,
+        //         name: "TUESDAY DOOMSDAY",
+        //         goal: "You know it ;)."
+        //     },
+        //     [
+        //         {
+        //             name: "pull-up",
+        //             duration: 60,
+        //             sets: 5,
+        //             reps: 10
+        //         },
+        //         {
+        //             name: "PUSH-up",
+        //             sets: 12,
+        //             reps: 1
+        //         },
+        //         {
+        //             name: "Sit-up",
+        //             sets: 12,
+        //             reps: 1
+        //         }
+        //     ]
+        // );
+
+        // await createRoutine(
+        //     {
+        //         userId: 2,
+        //         public: true,
+        //         name: "FRIDAY MYDAY",
+        //         goal: "YEAH!."
+        //     },
+        //     [
+        //         {
+        //             name: "pull-up",
+        //             duration: 60,
+        //             sets: 5,
+        //             reps: 10
+        //         },
+        //         {
+        //             name: "PUSH-up",
+        //             sets: 12,
+        //             reps: 1
+        //         },
+        //         {
+        //             name: "Sit-up",
+        //             sets: 12,
+        //             reps: 1
+        //         }
+        //     ]
+        // );
+
+        // await createRoutine(
+        //     {
+        //         userId: 1,
+        //         public: true,
+        //         name: "DESTROY ME",
+        //         goal: ":O"
+        //     },
+        //     [
+        //         {
+        //             name: "PUSH-up",
+        //             sets: 12,
+        //             reps: 1
+        //         }
+        //     ]
+        // );
+        console.log("routineOne:", routineOne);
         console.log("Finished creating routines!");
     } catch (error) {
         console.error("Error creating routines!");
@@ -257,11 +316,11 @@ async function testDB() {
         const activities = await getAllActivities();
         console.log("getAllActivities:", activities);
 
-        const updateActivityResult = await updateActivity(users[0].id, {
-            name: "New Activity",
-            description: "New Description"
-        });
-        console.log("Update First Acitivty in Array:", updateActivityResult);
+        // const updateActivityResult = await updateActivity(users[0].id, {
+        //     name: "New Activity",
+        //     description: "New Description"
+        // });
+        // console.log("Update First Acitivty in Array:", updateActivityResult);
 
         const routines = await getAllRoutines();
         console.log("getAllRoutines:", routines);
@@ -271,6 +330,9 @@ async function testDB() {
 
         const routinesByUser = await getAllRoutinesByUser({ username: "lacey" });
         console.log("getAllRoutinesByUser 'lacey':", routinesByUser);
+
+        const routineByName = await getRoutineByName({ name: "TUESDAY DOOMSDAY" });
+        console.log("routineByName 'TUESDAY DOOMSDAY': ", routineByName);
 
         const publicRoutinesByUser = await getPublicRoutinesByUser({ username: "bryan" });
         console.log("getPublicRoutinesByUser 'bryan':", publicRoutinesByUser);
