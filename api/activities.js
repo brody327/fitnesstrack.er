@@ -8,7 +8,8 @@ activitiesRouter.use((req, res, next) => {
     next();
 });
 
-//GET Middleware
+// ~~ MIDDLEWARE ~~
+//-- GET Middleware --
 //Get all activities.
 activitiesRouter.get('/', async (req, res) => {
     try {
@@ -17,8 +18,8 @@ activitiesRouter.get('/', async (req, res) => {
         res.send({
             'activities': activities
         });
-    } catch (error) {
-        next(error);
+    } catch ({ name, message }) {
+        next({ name, message });
     }
 });
 
@@ -31,12 +32,12 @@ activitiesRouter.get('/:activityId/routines', async (req, res) => {
         res.send({
             'routines': routines
         });
-    } catch (error) {
-        next(error);
+    } catch ({ name, message }) {
+        next({ name, message });
     }
 });
 
-//POST Middleware
+// -- POST Middleware --
 //Create a new activity.
 activitiesRouter.post('/', requireUser, async (req, res, next) => {
     const { name, description } = req.body;
@@ -67,13 +68,13 @@ activitiesRouter.post('/', requireUser, async (req, res, next) => {
                 }
             }
 
-        } catch (error) {
-            next(error);
+        } catch ({ name, message }) {
+            next({ name, message });
         }
     }
 });
 
-//PATCH Middleware
+//-- PATCH Middleware --
 //Update activity given an activity id.
 activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
     const { activityId } = req.params;
@@ -102,8 +103,8 @@ activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
             } else {
                 next({ name: "InvalidInput", message: "This activity does not exist." });
             }
-        } catch (error) {
-            next(error);
+        } catch ({ name, message }) {
+            next({ name, message });
         }
     }
 })

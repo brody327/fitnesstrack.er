@@ -1,20 +1,23 @@
 const { client } = require("./client");
 
-// async function createRoutineActivities(routineId, activityId) {
-//     try {
-//         console.log(routineId, activityId);
-//         const result = await client.query(`
-//         INSERT INTO routine_activities("routineId", "activityId")
-//         VALUES ($1, $2)
-//         ON CONFLICT ("routineId", "activityId") DO NOTHING;
-//         `, [routineId, activityId])
+//Get routine_activity by id.
+async function getRoutineActivityById(id) {
+    try {
+        console.log("Getting routine_activity...")
 
-//         console.log("Create Join Table:", result)
-//     } catch (error) {
-//         throw error;
-//     }
-// }
+        const { rows } = await client.query(`
+        SELECT *
+        FROM routine_activities
+        WHERE id=$1;
+        `, [id]);
 
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//Create a new routine_activity. This connects a routine with its activities.
 async function createRoutineActivities({ routineId, activityId, duration, sets, reps }) {
     try {
         console.log("Creating routine_activity...")
@@ -33,6 +36,7 @@ async function createRoutineActivities({ routineId, activityId, duration, sets, 
     }
 }
 
+//Updates a routine_activity.
 async function updateRoutineActivity(id, fields = {}) {
     try {
         const setString = Object.keys(fields).map(
@@ -42,7 +46,7 @@ async function updateRoutineActivity(id, fields = {}) {
         const { rows } = await client.query(`
         UPDATE routine_activities
         SET ${setString}
-        WHERE "routineId"=${id}
+        WHERE id=${id}
         RETURNING *;
         `, Object.values(fields));
 
@@ -52,15 +56,14 @@ async function updateRoutineActivity(id, fields = {}) {
     }
 }
 
-//Don't know what this is supposed to be doing
-//used to be dumb but now its not
-async function destroyRoutineActivity(activityId) {
+//Destroys a routine_activity. Deletes an activity from a routine.
+async function destroyRoutineActivity(routineActivitiyId) {
     try {
         const { rows: deletedRoutine } = await client.query(`
         DELETE FROM routine_activities
-        WHERE "activityId"=$1
+        WHERE id=$1
         RETURNING *;
-        `, [activityId]);
+        `, [routineActivitiyId]);
 
         return deletedRoutine;
     } catch (error) {
@@ -69,13 +72,8 @@ async function destroyRoutineActivity(activityId) {
 }
 
 module.exports = {
+    getRoutineActivityById,
     createRoutineActivities,
     updateRoutineActivity,
     destroyRoutineActivity
 }
-
-/*
-SELECT routine_activities."routineId", routines.name, routine_activities.duration
-FROM routine_activities
-INNER JOIN routines ON routine_activities."routineId"=routines.id;
-*/

@@ -1,5 +1,6 @@
 const { client } = require("./client");
 
+//Gets all users.
 async function getAllUsers() {
     const { rows } = await client.query(
         `SELECT id, username 
@@ -9,6 +10,7 @@ async function getAllUsers() {
     return rows;
 }
 
+//Gets a user using their username.
 async function getUser({ username }) {
     try {
         const { rows: [user] } = await client.query(`
@@ -23,6 +25,7 @@ async function getUser({ username }) {
     }
 }
 
+//Creates a new user.
 async function createUser({ username, password }) {
     try {
         const { rows } = await client.query(`

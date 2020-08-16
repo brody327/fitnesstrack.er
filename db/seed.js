@@ -1,5 +1,7 @@
 const { client } = require("./client");
 
+//Many of these are used only for testing. I don't know if you will use this to test specifically the back end, so I will leave them in.
+//They would ideally be removed.
 const { getAllUsers, getUser, createUser,
     getAllActivities, createActivity, updateActivity,
     getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getRoutineByName, getPublicRoutinesByUser, getPublicRoutinesByActivityId, updateRoutine, createRoutine, destroyRoutine,
@@ -79,13 +81,9 @@ async function createInitialUsers() {
     try {
         console.log("Starting to create users...");
 
-        const brody = await createUser({ username: 'brody', password: 'wolfgang' });
-        const bryan = await createUser({ username: 'bryan', password: 'zachariah' });
-        const lacey = await createUser({ username: 'lacey', password: 'lacey21' });
-
-        console.log(brody);
-        console.log(bryan);
-        console.log(lacey);
+        await createUser({ username: 'brody', password: 'wolfgang' });
+        await createUser({ username: 'bryan', password: 'zachariah' });
+        await createUser({ username: 'lacey', password: 'lacey21' });
 
         console.log("Finished creating users!");
     } catch (error) {
@@ -98,22 +96,18 @@ async function createInitialActivities() {
     try {
         console.log("Starting to create activities...");
 
-        const pushUP = await createActivity({
+        await createActivity({
             name: 'push-up',
             description: 'A conditioning exercise performed in a prone position by raising and lowering the body with the straightening and bending of the arms while keeping the back straight and supporting the body on the hands and toes.'
         });
-        const sitUp = await createActivity({
+        await createActivity({
             name: 'sit-up',
             description: 'An exercise in which a person lies flat on the back, lifts the torso to a sitting position, and then lies flat again without changing the position of the legs: formerly done with the legs straight but now usually done with the knees bent.'
         });
-        const pullUp = await createActivity({
+        await createActivity({
             name: 'pull-up',
             description: 'An exercise consisting of chinning oneself, as on a horizontal bar attached at each end to a doorpost.'
         });
-
-        console.log(pushUP);
-        console.log(sitUp);
-        console.log(pullUp);
 
         console.log("Finished creating activities!");
     } catch (error) {
@@ -147,10 +141,11 @@ async function createInitialRoutines() {
             ]
         });
 
-        const routineOne = await createRoutine({
+        await createRoutine({
             "routineData": {
                 "name": "This routine",
                 "goal": "Be the best.",
+                userId: 2,
                 "public": true
             },
             "activities": [
@@ -170,6 +165,7 @@ async function createInitialRoutines() {
             "routineData": {
                 "name": "A new one",
                 "goal": "random goal",
+                userId: 2,
                 "public": true
             },
             "activities": [
@@ -185,103 +181,6 @@ async function createInitialRoutines() {
 
         });
 
-        // await createRoutine(
-        //     {
-        //         userId: 1,
-        //         public: false,
-        //         name: "Monday",
-        //         goal: "Chest workout and legs."
-        //     },
-        //     [
-        //         {
-        //             name: "pull-up",
-        //             duration: 60,
-        //             sets: 5,
-        //             reps: 10
-        //         },
-        //         {
-        //             name: "PUSH-up",
-        //             sets: 12,
-        //             reps: 1
-        //         }
-        //     ]
-        // );
-        // await createRoutine({ userId: 3, public: true, name: "REDEMPTION", goal: "EVERYTHING!" }, [{
-        //     name: "SIT-UP",
-        //     duration: 120,
-        //     sets: 500,
-        //     reps: 100
-        // },]);
-        // await createRoutine(
-        //     {
-        //         userId: 2,
-        //         public: false,
-        //         name: "TUESDAY DOOMSDAY",
-        //         goal: "You know it ;)."
-        //     },
-        //     [
-        //         {
-        //             name: "pull-up",
-        //             duration: 60,
-        //             sets: 5,
-        //             reps: 10
-        //         },
-        //         {
-        //             name: "PUSH-up",
-        //             sets: 12,
-        //             reps: 1
-        //         },
-        //         {
-        //             name: "Sit-up",
-        //             sets: 12,
-        //             reps: 1
-        //         }
-        //     ]
-        // );
-
-        // await createRoutine(
-        //     {
-        //         userId: 2,
-        //         public: true,
-        //         name: "FRIDAY MYDAY",
-        //         goal: "YEAH!."
-        //     },
-        //     [
-        //         {
-        //             name: "pull-up",
-        //             duration: 60,
-        //             sets: 5,
-        //             reps: 10
-        //         },
-        //         {
-        //             name: "PUSH-up",
-        //             sets: 12,
-        //             reps: 1
-        //         },
-        //         {
-        //             name: "Sit-up",
-        //             sets: 12,
-        //             reps: 1
-        //         }
-        //     ]
-        // );
-
-        // await createRoutine(
-        //     {
-        //         userId: 1,
-        //         public: true,
-        //         name: "DESTROY ME",
-        //         goal: ":O"
-        //     },
-        //     [
-        //         {
-        //             name: "PUSH-up",
-        //             sets: 12,
-        //             reps: 1
-        //         }
-        //     ]
-        // );
-        console.log("routineOne:", routineOne);
         console.log("Finished creating routines!");
     } catch (error) {
         console.error("Error creating routines!");
@@ -303,55 +202,56 @@ async function rebuildDB() {
     }
 }
 
+//I don't think this needs to exist, but I will leave it here just in case.
 async function testDB() {
     try {
         console.log("Starting to test database...");
 
-        const users = await getAllUsers();
-        console.log("getAllUsers:", users);
+        //         const users = await getAllUsers();
+        //         console.log("getAllUsers:", users);
 
-        const oneUser = await getUser({ username: 'lacey' });
-        console.log('getUser:', oneUser);
+        //         const oneUser = await getUser({ username: 'lacey' });
+        //         console.log('getUser:', oneUser);
 
-        const activities = await getAllActivities();
-        console.log("getAllActivities:", activities);
+        //         const activities = await getAllActivities();
+        //         console.log("getAllActivities:", activities);
 
-        // const updateActivityResult = await updateActivity(users[0].id, {
-        //     name: "New Activity",
-        //     description: "New Description"
-        // });
-        // console.log("Update First Acitivty in Array:", updateActivityResult);
+        //         //Testing this breaks some functions on server-side!
+        //         // const updateActivityResult = await updateActivity(users[0].id, {
+        //         //     name: "New Activity",
+        //         //     description: "New Description"
+        //         // });
+        //         // console.log("Update First Acitivty in Array:", updateActivityResult);
 
-        const routines = await getAllRoutines();
-        console.log("getAllRoutines:", routines);
+        //         const routines = await getAllRoutines();
+        //         console.log("getAllRoutines:", routines);
 
-        const publicRoutines = await getAllPublicRoutines();
-        console.log("getAllPublicRoutines:", publicRoutines);
+        //         const publicRoutines = await getAllPublicRoutines();
+        //         console.log("getAllPublicRoutines:", publicRoutines);
 
-        const routinesByUser = await getAllRoutinesByUser({ username: "lacey" });
-        console.log("getAllRoutinesByUser 'lacey':", routinesByUser);
+        //         const routinesByUser = await getAllRoutinesByUser({ username: "lacey" });
+        //         console.log("getAllRoutinesByUser 'lacey':", routinesByUser);
 
-        const routineByName = await getRoutineByName({ name: "TUESDAY DOOMSDAY" });
-        console.log("routineByName 'TUESDAY DOOMSDAY': ", routineByName);
+        //         const routineByName = await getRoutineByName({ name: "TUESDAY DOOMSDAY" });
+        //         console.log("routineByName 'TUESDAY DOOMSDAY': ", routineByName);
 
-        const publicRoutinesByUser = await getPublicRoutinesByUser({ username: "bryan" });
-        console.log("getPublicRoutinesByUser 'bryan':", publicRoutinesByUser);
+        //         const publicRoutinesByUser = await getPublicRoutinesByUser({ username: "bryan" });
+        //         console.log("getPublicRoutinesByUser 'bryan':", publicRoutinesByUser);
 
-        const publicRoutinesByActivityId = await getPublicRoutinesByActivityId({ activityId: 3 });
-        console.log("getPublicRoutinesByActivityId:", publicRoutinesByActivityId);
+        //         const publicRoutinesByActivityId = await getPublicRoutinesByActivityId({ activityId: 3 });
+        //         console.log("getPublicRoutinesByActivityId:", publicRoutinesByActivityId);
 
-        const updatedRoutine = await updateRoutine(1, { public: true, name: "UPDATED", goal: "Be the best." });
-        console.log("updatedRoutine:", updatedRoutine);
+        //         const updatedRoutine = await updateRoutine(1, { public: true, name: "UPDATED", goal: "Be the best." });
+        //         console.log("updatedRoutine:", updatedRoutine);
 
-        const destroyedRoutine = await destroyRoutine(5);
-        console.log("destroyedRoutine:", destroyedRoutine);
+        //         const destroyedRoutine = await destroyRoutine(5);
+        //         console.log("destroyedRoutine:", destroyedRoutine);
 
-        const updatedRoutineActivity = await updateRoutineActivity(2, { duration: 100, sets: 3, reps: 8 });
-        console.log("updatedRoutineActivity:", updatedRoutineActivity);
+        //         const updatedRoutineActivity = await updateRoutineActivity(2, { duration: 100, sets: 3, reps: 8 });
+        //         console.log("updatedRoutineActivity:", updatedRoutineActivity);
 
-        //Takes an activityid number
-        const destroyedRoutineActivity = await destroyRoutineActivity(2);
-        console.log("destroyedRoutineActivity:", destroyedRoutineActivity);
+        //         const destroyedRoutineActivity = await destroyRoutineActivity(2);
+        //         console.log("destroyedRoutineActivity:", destroyedRoutineActivity);
 
         console.log("Finished database tests!");
     } catch (error) {

@@ -1,5 +1,5 @@
 const routinesRouter = require('express').Router();
-const { getAllPublicRoutines, getRoutineByName, createRoutine, getRoutineById, getActivityByName, createRoutineActivities, updateRoutine } = require('../db');
+const { getAllPublicRoutines, getRoutineByName, createRoutine, getRoutineById, getActivityByName, createRoutineActivities, updateRoutine, destroyRoutine } = require('../db');
 const { requireUser } = require('./utils');
 
 routinesRouter.use((req, res, next) => {
@@ -8,7 +8,8 @@ routinesRouter.use((req, res, next) => {
     next();
 });
 
-//GET Middleware
+// ~~ MIDDLEWARE ~~
+//-- GET Middleware --
 //Get all public routines.
 routinesRouter.get('/', async (req, res) => {
     try {
@@ -16,12 +17,12 @@ routinesRouter.get('/', async (req, res) => {
         res.send({
             'routines': routines
         });
-    } catch (error) {
-        throw error;
+    } catch ({ name, message }) {
+        next({ name, message });
     }
 });
 
-//POST Middleware
+//-- POST Middleware --
 //Create new routine.
 routinesRouter.post('/', requireUser, async (req, res, next) => {
     const { public, name, goal } = req.body.routineData;
@@ -53,8 +54,8 @@ routinesRouter.post('/', requireUser, async (req, res, next) => {
                 }
             }
 
-        } catch (error) {
-            next(error);
+        } catch ({ name, message }) {
+            next({ name, message });
         }
     }
 });
@@ -62,7 +63,6 @@ routinesRouter.post('/', requireUser, async (req, res, next) => {
 //Add an activity to a routine.
 routinesRouter.post('/:routineId/activities', async (req, res, next) => {
     const { name, duration, sets, reps } = req.body;
-    console.log("ACTIVTIY:", name, duration, sets, reps);
 
     try {
         const retrievedActivity = await getActivityByName(name);
@@ -118,24 +118,20 @@ routinesRouter.post('/:routineId/activities', async (req, res, next) => {
         } else {
             next({ name: "InvalidInput", message: "Activity does not exist to update." })
         }
-    } catch (error) {
-        next(error);
+    } catch ({ name, message }) {
+        next({ name, message });
     }
 });
 
-//PATCH Middleware
+//-- PATCH Middleware --
 //Update a routine.
 routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
-    //(id, fields = {})
     const { name, public, goal } = req.body;
     const { routineId } = req.params;
 
     try {
         //Retrieve routine from passed id.
         const originalRoutine = await getRoutineById(routineId);
-
-        console.log(name, public, goal);
-        console.log(originalRoutine);
 
         //Check if logged in user is same user for routine.
         if (originalRoutine.user.id !== req.user.id) {
@@ -165,16 +161,40 @@ routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
                 next({ name: "InvalidResponse", message: "This routine could not be updated." })
             }
         }
-    } catch (error) {
-        next(error);
+    } catch ({ name, message }) {
+        next({ name, message });
     }
 });
 
-//DELETE Middleware
+//-- DELETE Middleware --
 //Delete a routine.
-routinesRouter.delete('/:routineId', async (req, res, next) => {
+//For some reasons some of my error messages (next(...)) are not firing when they should. They still produce and error, just not the
+//specified name/message response it should.
+routinesRouter.delete('/:routineId', requireUser, async (req, res, next) => {
     const { routineId } = req.params;
+    try {
+        const routine = await getRoutineById(routineId);
+        //Check if routine exists.
+        if (!routine) {
+            next({ name: "InvalidInput", message: "This routine does not exist." })
+        } else {
+            //Checks if logged in user and routine's user match.
+            if (routine.user.id !== req.user.id) {
+                next({ name: "InvalidUser", message: "You cannot delete a routine you are not the owner of." })
+            } else {
+                const [destroyedRoutine] = await destroyRoutine(routineId);
 
+                //Checks if destroyRoutine was successful.
+                if (destroyedRoutine) {
+                    res.send({ message: "The routine was successfully destroyed.", destroyedRoutine });
+                } else {
+                    next({ name: "InvalidResponse", message: "This routine could not be deleted." })
+                }
+            }
+        }
+    } catch ({ name, message }) {
+        next({ name, message });
+    }
 });
 
 module.exports = routinesRouter

@@ -1,4 +1,6 @@
-//Helper Middleware
+// ~~ MIDDLEWARE ~~
+// -- Helper Middleware --
+//Send an error if a user is not logged in.
 function requireUser(req, res, next) {
     if (!req.user) {
         next({

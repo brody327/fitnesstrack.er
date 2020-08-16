@@ -1,7 +1,10 @@
 const { client } = require("./client");
-const { getActivityByName, getActivityById } = require("./activities");
-const { createRoutineActivities } = require("./routine_activities");
+//For some reason this is not working when trying to draw from .index. It works with seem, but not here.
+// const { getActivityByName, createRoutineActivities } = require("./index");
+const { getActivityByName } = require('./activities');
+const { createRoutineActivities } = require('./routine_activities');
 
+//Get all routines.
 async function getAllRoutines() {
     try {
         const { rows: routineIds } = await client.query(`
@@ -19,7 +22,7 @@ async function getAllRoutines() {
     }
 }
 
-
+//Get a public routines.
 async function getAllPublicRoutines() {
     try {
         const { rows: routineIds } = await client.query(`
@@ -38,6 +41,7 @@ async function getAllPublicRoutines() {
     }
 }
 
+//Get a routine using its name.
 async function getRoutineByName({ name }) {
     try {
         const { rows: id } = await client.query(`
@@ -46,16 +50,13 @@ async function getRoutineByName({ name }) {
         WHERE name=$1;
         `, [name]);
 
-        // const routines = await Promise.all(routineIds.map(
-        //     routine => getRoutineById(routine.id)
-        // ));
-
         return id;
     } catch (error) {
         throw error;
     }
 }
 
+//Get all routines from a user.
 async function getAllRoutinesByUser({ username }) {
     try {
         const { rows: user } = await client.query(`
@@ -81,6 +82,7 @@ async function getAllRoutinesByUser({ username }) {
     }
 }
 
+//Get all public routines from a user.
 async function getPublicRoutinesByUser({ username }) {
     try {
         const { rows: user } = await client.query(`
@@ -106,6 +108,7 @@ async function getPublicRoutinesByUser({ username }) {
     }
 }
 
+//Get all public routines that have a specific activity in them.
 async function getPublicRoutinesByActivityId({ activityId }) {
     try {
         const { rows: routineIds } = await client.query(`
@@ -126,37 +129,7 @@ async function getPublicRoutinesByActivityId({ activityId }) {
 
 }
 
-//Needs to have another join (2) table for the activities.name to routine.id
-// async function getPublicRoutinesByActivityName({ name }) {
-//     name = name.toLowerCase();
-//     try {
-//         const { rows: routineIds } = await client.query(`
-//         SELECT routines.id
-//         FROM routines
-//         JOIN routine_activities ON routines.id=routine_activities."routineId"
-//         WHERE routine_activities."activityId"=$1 AND routines.public=true;
-//         `, [name]);
-
-//         const { rows: routineIds } = await client.query(`
-//         SELECT id
-//         FROM routines
-//         WHERE public=true AND name=$1;
-//         `, [name]);
-
-//         console.log("ROUTINE IDS:", routineIds);
-
-//         const routines = await Promise.all(routineIds.map(
-//             routine => getRoutineById(routine.id)
-//         ));
-
-//         return routines;
-//     } catch (error) {
-//         throw error;
-//     }
-
-// }
-//Original Call
-//async function createRoutine({ userId, public, name, goal }, activities = []) {
+//Creates a routine by being passed a routineData object and an array of activity objects.
 async function createRoutine({ routineData, activities = [] }) {
     const { name, userId, public, goal } = routineData;
 
@@ -168,12 +141,14 @@ async function createRoutine({ routineData, activities = [] }) {
         RETURNING *;
         `, [userId, public, name, goal]);
 
+        //Unfortunatley, taking this into its own function breaks it for some reason.
         for (const activity of activities) {
             activity.name = (activity.name).toLowerCase();
             const activityIdObject = await getActivityByName(activity.name);
 
             activity.activityId = activityIdObject.id;
             activity.routineId = routine.id;
+
             await createRoutineActivities(activity);
         }
 
@@ -183,23 +158,7 @@ async function createRoutine({ routineData, activities = [] }) {
     }
 }
 
-// async function addActivitiesToRoutines(routine, activities) {
-//     try {
-//         for (const activity of activities) {
-//             activity.name = (activity.name).toLowerCase();
-//             const activityIdObject = await getActivityByName(activity.name);
-//             activity.activityId = activityIdObject.id;
-//             activity.routineId = routine.id;
-//             await createRoutineActivities(activity);
-//         }
-
-//         return await getRoutineById(routine.id);
-//     } catch (error) {
-//         throw error;
-//     }
-
-// }
-
+//Gets a routine using its id and creates the final routine object, attaching its activities and the user.
 async function getRoutineById(routineId) {
     try {
         const { rows: [routine] } = await client.query(`
@@ -232,10 +191,9 @@ async function getRoutineById(routineId) {
     }
 }
 
+//Updates the specified routine.
 async function updateRoutine(id, fields = {}) {
     try {
-        //Why would this be nessecary?
-        // const routine = await getRoutineById(id);
 
         const setString = Object.keys(fields).map(
             (key, index) => `"${key}"=$${index + 1}`
@@ -254,26 +212,26 @@ async function updateRoutine(id, fields = {}) {
     }
 }
 
-//TAKE AWAY RETURNING/return FOR FINAL
+//Destroys the specified routine.
 async function destroyRoutine(id) {
     try {
-        const { rows: routine_activitiesDelete } = await client.query(`
+        await client.query(`
         DELETE FROM routine_activities
-        WHERE "routineId"=$1
-        RETURNING *;
+        WHERE "routineId"=$1;
         `, [id]);
 
-        const { rows: routineDelete } = await client.query(`
+        const { rows: routineDeleted } = await client.query(`
         DELETE FROM routines
         WHERE id=$1
         RETURNING *;
         `, [id]);
 
-        return [routine_activitiesDelete, routineDelete];
+        return [routineDeleted[0]];
     } catch (error) {
         throw error;
     }
 }
+
 module.exports = {
     getAllRoutines,
     getAllPublicRoutines,

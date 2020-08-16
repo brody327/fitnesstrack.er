@@ -1,5 +1,7 @@
 const { client } = require("./client");
 
+//-- Functions --
+//Gets all activities.
 async function getAllActivities() {
     try {
         const { rows } = await client.query(`
@@ -13,6 +15,7 @@ async function getAllActivities() {
     }
 }
 
+//Gets activity by name.
 async function getActivityByName(activityName) {
     try {
         activityName = activityName.toLowerCase();
@@ -29,6 +32,7 @@ async function getActivityByName(activityName) {
     }
 }
 
+//Gets activity by id.
 async function getActivityById(activityId) {
     try {
         const { rows } = await client.query(`
@@ -43,7 +47,7 @@ async function getActivityById(activityId) {
     }
 }
 
-
+//Creates a new activity.
 async function createActivity({ name, description }) {
     name = name.toLowerCase();
     try {
@@ -60,6 +64,7 @@ async function createActivity({ name, description }) {
     }
 }
 
+//Updates an activity using id.
 async function updateActivity(id, fields = {}) {
     const setString = Object.keys(fields).map(
         (key, index) => `"${key}"=$${index + 1}`).join(', ');

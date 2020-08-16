@@ -9,7 +9,8 @@ usersRouter.use((req, res, next) => {
     next();
 });
 
-//GET Middleware
+// ~~ MIDDLEWARE ~~
+//-- GET Middleware --
 //Get all users.
 usersRouter.get('/', async (req, res) => {
     try {
@@ -34,7 +35,7 @@ usersRouter.get('/:username/routines', async (req, res) => {
     }
 });
 
-//POST Middleware
+//-- POST Middleware --
 //Register User
 usersRouter.post('/register', async (req, res, next) => {
     try {
